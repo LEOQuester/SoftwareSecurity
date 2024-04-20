@@ -176,33 +176,54 @@ exports.getReviews = catchAsyncError(async(req,res,next)=>{
 })
 
 //Delete Reviews - api/v1/review
-exports.deleteReview = catchAsyncError(async(req,res,next)=>{
-    const product= await schema.findById(req.query.productId);
-    //filter reviews that does not match with delete id
-    const reviews = product.reviews.filter(review=>{
-        return review._id.toString() !== req.query.id.toString()
-    })
-    //number of reviews
-    const numberOfReviews=reviews.length
-    //find the avg rating of the product
-    let rating = reviews.reduce((acc,review)=>{
-        return review.rating+acc;
-    },0)/reviews.length;
+exports.deleteReview = catchAsyncError(async (req, res, next) => {
+    try {
+        // Validate request parameters
+        if (!req.query.productId || !req.query.id) {
+            return res.status(400).json({ error: 'productId and id are required in the query parameters' });
+        }
 
-    rating=isNaN(rating)?0:rating;
+        // Check if req.query.productId and req.query.id are valid ObjectId strings
+        if (!ObjectId.isValid(req.query.productId) || !ObjectId.isValid(req.query.id)) {
+            return res.status(400).json({ error: 'Invalid ObjectId in query parameters' });
+        }
 
-    //update the product
-    await schema.findByIdAndUpdate(req.query.productId,{rating,reviews,numberOfReviews},{
-        new:true,
-        runValidators:true
-    })
-    res.status(200).json({
-        success:true,
-        reviews:product.reviews
-    })
+        // Find the product by productId
+        const product = await schema.findById(req.query.productId);
 
-})
+        // Check if product exists
+        if (!product) {
+            return res.status(404).json({ error: 'Product not found' });
+        }
 
+        // Filter reviews that do not match the delete id
+        const reviews = product.reviews.filter(review => review._id.toString() !== req.query.id.toString());
+
+        // Calculate the number of reviews
+        const numberOfReviews = reviews.length;
+
+        // Calculate the average rating of the product
+        let rating = 0;
+        if (numberOfReviews > 0) {
+            rating = reviews.reduce((acc, review) => acc + review.rating, 0) / numberOfReviews;
+        }
+
+        // Update the product with the filtered reviews, number of reviews, and average rating
+        const updatedProduct = await schema.findByIdAndUpdate(
+            req.query.productId,
+            { rating, reviews, numberOfReviews },
+            { new: true, runValidators: true }
+        );
+
+        // Return the updated reviews of the product
+        res.status(200).json({
+            success: true,
+            reviews: updatedProduct.reviews
+        });
+    } catch (error) {
+        next(error); // Pass the error to the error handling middleware
+    }
+});
 //get admin products - api/v1/admin/products
 
 exports.getAdminProducts = catchAsyncError(async(req,res,next)=>{
