@@ -4,7 +4,7 @@ import { Helmet } from 'react-helmet-async'
 const MetaData = ({title}) => {
   return (
     <Helmet>
-        <title>{`${title} - Azhagan Exports`}</title>
+        <title>{`${title} - Chehan Exports`}</title>
     </Helmet>
   )
 }

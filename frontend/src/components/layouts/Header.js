@@ -22,9 +22,9 @@ const Header = ({page}) => {
     <section id="header">
     <div className='d-flex'>
     <Link to="/">
-      <img width="75px" src="/images/logo.png" alt='Azhagan Exports Logo'/>
+      <img width="75px" src="/images/logo.png" alt='Chehan Exports Logo'/>
     </Link>
-    <Link to="/" id="ae">Azhagan Exports</Link>   
+    <Link to="/" id="ae">Chehan Exports</Link>   
     </div>
     <div>
     
