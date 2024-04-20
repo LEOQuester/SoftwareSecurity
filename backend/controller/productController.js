@@ -187,7 +187,15 @@ exports.deleteReview = catchAsyncError(async (req, res, next) => {
         if (!ObjectId.isValid(req.query.productId) || !ObjectId.isValid(req.query.id)) {
             return res.status(400).json({ error: 'Invalid ObjectId in query parameters' });
         }
+        // Check if req.query.id is provided and is a string
+        if (!req.query.id || typeof req.query.id !== 'string') {
+            return res.status(400).json({ error: 'Invalid or missing review ID in query parameters' });
+        }
 
+        // Check if req.query.id is a valid ObjectId
+        if (!ObjectId.isValid(req.query.id)) {
+            return res.status(400).json({ error: 'Invalid review ID format' });
+        }
         // Find the product by productId
         const product = await schema.findById(req.query.productId);
 
