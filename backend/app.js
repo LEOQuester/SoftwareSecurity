@@ -17,6 +17,15 @@ app.use(cors());
 app.use(express.json())
 app.use('/uploads',express.static(path.join(__dirname,'uploads')))
 app.use(cookieParser())
+
+// Use csurf middleware to enable CSRF protection
+app.use(csrf({ cookie: true }));
+
+// Middleware to set CSRF token in a cookie
+app.use((req, res, next) => {
+  res.cookie('XSRF-TOKEN', req.csrfToken());
+  next();
+});
 app.use('/api/v1/',product)
 app.use('/api/v1/',auth)
 app.use('/api/v1/',order)
