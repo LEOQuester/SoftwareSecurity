@@ -1,5 +1,6 @@
 const express = require('express')
 const csrf = require('csurf');
+const helmet = require('helmet');
 const product = require('./routes/product')
 const auth = require('./routes/auth')
 const order = require('./routes/order')
@@ -17,6 +18,7 @@ dotenv.config({path:path.join(__dirname,"config/configuration.env")})
 app.use(cors());
 app.use(express.json())
 app.use('/uploads',express.static(path.join(__dirname,'uploads')))
+app.use(helmet());
 app.use(cookieParser())
 
 // Use csurf middleware to enable CSRF protection
